@@ -11,7 +11,7 @@ export default function handler(req, res) {
       try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
 
-    // Ambil teks dari pesan_masuk ATAU user_message
+    // INI KUNCINYA: BACA 'pesan_masuk' DARI QONTAK
     const rawText = body?.pesan_masuk || body?.user_message || body?.message || body?.text || '';
     const text = String(rawText).toLowerCase();
 
