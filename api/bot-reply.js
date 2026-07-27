@@ -11,24 +11,27 @@ export default function handler(req, res) {
       try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
 
-    const userMessage = (body?.user_message || '').toLowerCase();
-    let reply = "";
+    const text = (body?.user_message || '').toLowerCase();
+    let intent = "UNKNOWN";
 
-    if (userMessage.includes("manajemen") || userMessage.includes("management")) {
-      if (userMessage.includes("s1") || userMessage.includes("ibm")) {
-        reply = "Untuk S1 Management (IBM), fokus pada entrepreneurship & global business. Mau info kurikulumnya?";
-      } else if (userMessage.includes("s2") || userMessage.includes("mem")) {
-        reply = "Untuk S2 Master Executive Management (MEM), kelas cocok untuk profesional & business owner.";
+    // Logika Klasifikasi Intent
+    if (text.includes("manajemen") || text.includes("management")) {
+      if (text.includes("s1") || text.includes("ibm")) {
+        intent = "S1_IBM";
+      } else if (text.includes("s2") || text.includes("mem")) {
+        intent = "S2_MEM";
       } else {
-        reply = "Di UC Online Learning ada S1 Manajemen (IBM) dan S2 Manajemen (MEM). Mau info jenjang yang mana?";
+        intent = "MANAJEMEN_GENERAL"; // ambigu, tanya s1/s2
       }
-    } else {
-      reply = "Ada yang bisa dibantu mengenai info jurusan UC Online Learning?";
+    } else if (text.includes("informatika") || text.includes("imt") || text.includes("it")) {
+      intent = "S1_IMT";
+    } else if (text.includes("pendaftaran") || text.includes("maba") || text.includes("daftar")) {
+      intent = "REGISTRATION";
     }
 
-    // KIRIM KEMBALI SEBAGAI JSON DENGAN KEY response_text
-    return res.status(200).json({ response_text: reply });
+    // Mengembalikan JSON berisi intent
+    return res.status(200).json({ intent: intent });
   }
 
-  return res.status(200).json({ response_text: "API Bot Aktif!" });
+  return res.status(200).json({ intent: "UNKNOWN" });
 }
