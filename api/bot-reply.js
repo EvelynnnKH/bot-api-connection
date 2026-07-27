@@ -1,44 +1,40 @@
 export default function handler(req, res) {
+  // Allow CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method === 'POST') {
-    const userMessage = (req.body.user_message || '').toLowerCase();
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        body = {};
+      }
+    }
+
+    const userMessage = (body?.user_message || '').toLowerCase();
     let reply = "";
 
-    // Cek dulu apakah pesan mengandung unsur kata "manajemen" atau "management"
-    if (/\b(manajemen|management)\b/.test(userMessage)) {
-      
-      // 1. Jika spesifik ke S1 / IBM
-      if (/\b(s1|ibm|international business management)\b/.test(userMessage)) {
-        reply = "Halo! Buat International Business Management (IBM) S1, kita fokus ke entrepreneurship dan global business nih. Mau info tentang kurikulum atau beasiswanya?";
-      } 
-      // 2. Jika spesifik ke S2 / MEM
-      else if (/\b(s2|mem|master|executive)\b/.test(userMessage)) {
-        reply = "Halo! Buat S2 MEM (Master Executive Management), programnya cocok buat profesional & business owner. Mau info jadwal atau biayanya?";
-      } 
-      // 3. Jika CUMA nulis "manajemen" tanpa kejelasan S1/S2 -> Tanya dulu
-      else {
-        reply = "Halo! Di UC ada program S1 Manajemen (IBM) dan S2 Manajemen (MEM) nih. Boleh tahu kamu lagi cari info buat jenjang S1 atau S2?";
+    if (userMessage.includes("manajemen") || userMessage.includes("management")) {
+      if (userMessage.includes("s1") || userMessage.includes("ibm")) {
+        reply = "Untuk S1 Management (IBM), fokus pada entrepreneurship & global business. Mau info kurikulumnya?";
+      } else if (userMessage.includes("s2") || userMessage.includes("mem")) {
+        reply = "Untuk S2 Master Executive Management (MEM), kelas cocok untuk profesional & business owner.";
+      } else {
+        reply = "Di UC Online Learning ada S1 Manajemen (IBM) dan S2 Manajemen (MEM). Mau info jenjang yang mana?";
       }
-
-    } 
-    // Untuk jurusan IMT / IT (Informatika)
-    else if (/\b(imt|technology|it|informatika)\b/.test(userMessage)) {
-      reply = "Hai! Jurusan IMT fokus ke software engineering & AI. Mau tahu syarat masuk atau info perkelasannya?";
-    } 
-    // Untuk keyword langsung IBM
-    else if (/\b(ibm)\b/.test(userMessage)) {
-      reply = "Halo! Buat International Business Management (IBM) S1, kita fokus ke entrepreneurship dan global business nih. Mau info tentang kurikulum atau beasiswanya?";
-    } 
-    // Untuk keyword langsung MEM
-    else if (/\b(mem)\b/.test(userMessage)) {
-      reply = "Halo! Buat S2 MEM (Master Executive Management), programnya cocok buat profesional & business owner. Mau info jadwal atau biayanya?";
-    } 
-    // Fallback jika tidak match sama sekali
-    else {
-      reply = "Hai! Maaf ya, aku agak kurang paham. Kamu lagi mau tanya info jurusan IBM (S1), IMT (S1), MEM (S2), atau pendaftaran maba?";
+    } else {
+      reply = "Ada yang bisa dibantu mengenai info jurusan UC Online Learning?";
     }
 
     return res.status(200).json({ response_text: reply });
   }
 
-  return res.status(405).json({ message: 'Method Not Allowed' });
+  return res.status(200).json({ response_text: "API Bot Aktif!" });
 }
