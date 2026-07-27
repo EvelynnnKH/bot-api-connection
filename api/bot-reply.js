@@ -14,24 +14,21 @@ export default function handler(req, res) {
     const text = (body?.user_message || '').toLowerCase();
     let intent = "UNKNOWN";
 
-    // Logika Klasifikasi Intent
     if (text.includes("manajemen") || text.includes("management")) {
       if (text.includes("s1") || text.includes("ibm")) {
         intent = "S1_IBM";
       } else if (text.includes("s2") || text.includes("mem")) {
         intent = "S2_MEM";
       } else {
-        intent = "MANAJEMEN_GENERAL"; // ambigu, tanya s1/s2
+        intent = "MANAJEMEN_GENERAL";
       }
-    } else if (text.includes("informatika") || text.includes("imt") || text.includes("it")) {
+    } else if (text.includes("informatika") || text.includes("imt")) {
       intent = "S1_IMT";
-    } else if (text.includes("pendaftaran") || text.includes("maba") || text.includes("daftar")) {
-      intent = "REGISTRATION";
     }
 
-    // Mengembalikan JSON berisi intent
-    return res.status(200).json({ intent: intent });
+    // Balas string intent murni
+    return res.status(200).json({ response_text: intent });
   }
 
-  return res.status(200).json({ intent: "UNKNOWN" });
+  return res.status(200).json({ response_text: "UNKNOWN" });
 }
