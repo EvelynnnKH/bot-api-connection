@@ -11,8 +11,8 @@ export default function handler(req, res) {
       try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
 
-    // Ambil MURNI hanya dari teks pesan yang dikirim (dari pesan_masuk / user_message)
-    const rawText = body?.user_message || body?.pesan_masuk || body?.message || body?.text || '';
+    // Ambil teks dari pesan_masuk ATAU user_message
+    const rawText = body?.pesan_masuk || body?.user_message || body?.message || body?.text || '';
     const text = String(rawText).toLowerCase();
 
     let intent = "UNKNOWN";
@@ -27,7 +27,7 @@ export default function handler(req, res) {
         intent = "MANAJEMEN_GENERAL";
       }
     } 
-    // 2. CEK INFORMATIKA (Hapus "it" 2 huruf biar gak nembak salah sasaran)
+    // 2. CEK INFORMATIKA / IMT
     else if (
       text.includes("informatika") || 
       text.includes("imt") || 
@@ -38,7 +38,6 @@ export default function handler(req, res) {
       intent = "S1_IMT";
     }
 
-    // Return intent bersih dengan Underscore
     return res.status(200).json({ response_text: intent });
   }
 
