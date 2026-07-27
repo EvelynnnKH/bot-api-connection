@@ -11,28 +11,22 @@ export default function handler(req, res) {
       try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
 
-    // Ubah seluruh body JSON menjadi string untuk pemindaian menyeluruh
-    const fullPayloadStr = JSON.stringify(body || {}).toLowerCase();
-    
-    // Tangkap dari variabel umum
+    // Ambil MURNI teks yang diketik user saja
     const explicitText = (
-      body?.pesan_masuk || 
       body?.user_message || 
+      body?.pesan_masuk || 
       body?.message || 
       body?.text || 
       ''
-    ).toLowerCase();
-
-    // Gabungkan teks spesifik dan payload utuh
-    const textToSearch = explicitText + " " + fullPayloadStr;
+    ).toLowerCase().trim();
 
     let intent = "UNKNOWN";
 
     // 1. KONDISI MANAJEMEN
-    if (textToSearch.includes("manajemen") || textToSearch.includes("management") || textToSearch.includes("bisnis")) {
-      if (textToSearch.includes("s1") || textToSearch.includes("ibm") || textToSearch.includes("sarjana")) {
+    if (explicitText.includes("manajemen") || explicitText.includes("management") || explicitText.includes("bisnis")) {
+      if (explicitText.includes("s1") || explicitText.includes("ibm") || explicitText.includes("sarjana")) {
         intent = "S1_IBM";
-      } else if (textToSearch.includes("s2") || textToSearch.includes("mem") || textToSearch.includes("magister")) {
+      } else if (explicitText.includes("s2") || explicitText.includes("mem") || explicitText.includes("magister")) {
         intent = "S2_MEM";
       } else {
         intent = "MANAJEMEN_GENERAL";
@@ -40,20 +34,18 @@ export default function handler(req, res) {
     } 
     // 2. KONDISI INFORMATIKA / IMT
     else if (
-      textToSearch.includes("informatika") || 
-      textToSearch.includes("imt") || 
-      textToSearch.includes("komputer") || 
-      textToSearch.includes("coding") || 
-      textToSearch.includes("tech")
+      explicitText.includes("informatika") || 
+      explicitText.includes("imt") || 
+      explicitText.includes("komputer") || 
+      explicitText.includes("coding") || 
+      explicitText.includes("tech")
     ) {
-      intent = "S1_IMT";
+      explicitText = "S1_IMT";
     }
 
-    // Jika masih UNKNOWN, kembalikan string payload biar keliatan di DEBUG RESULT
-    const responseValue = intent !== "UNKNOWN" ? intent : `UNKNOWN_PAYLOAD:${fullPayloadStr}`;
-
-    return res.status(200).json({ response_text: responseValue });
+    // Kembalikan response_text dengan underscore (S1_IMT / MANAJEMEN_GENERAL)
+    return res.status(200).json({ response_text: intent });
   }
 
-  return res.status(200).json({ response_text: "UNKNOWN_NOT_POST" });
+  return res.status(200).json({ response_text: "UNKNOWN" });
 }
