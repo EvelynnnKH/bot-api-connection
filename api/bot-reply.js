@@ -11,35 +11,33 @@ export default function handler(req, res) {
       try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
 
-    // Ambil isi teks pesan
-    const userMsg = body?.user_message || body?.pesan_masuk || '';
-    const fullBodyStr = JSON.stringify(body || {});
-    const text = (userMsg + " " + fullBodyStr).toLowerCase();
+    // Ubah SELURUH objek body menjadi 1 string teks (apapun nama key variabel dari Qontak)
+    const rawString = JSON.stringify(body || {}).toLowerCase();
 
     let intent = "UNKNOWN";
 
-    // 1. CEK MANAJEMEN DULUAN
-    if (text.includes("manajemen") || text.includes("management") || text.includes("bisnis")) {
-      if (text.includes("s1") || text.includes("ibm") || text.includes("sarjana")) {
+    // 1. MANAJEMEN CHECK
+    if (rawString.includes("manajemen") || rawString.includes("management") || rawString.includes("bisnis")) {
+      if (rawString.includes("s1") || rawString.includes("ibm") || rawString.includes("sarjana")) {
         intent = "S1_IBM";
-      } else if (text.includes("s2") || text.includes("mem") || text.includes("magister")) {
+      } else if (rawString.includes("s2") || rawString.includes("mem") || rawString.includes("magister")) {
         intent = "S2_MEM";
       } else {
         intent = "MANAJEMEN_GENERAL";
       }
     } 
-    // 2. CEK INFORMATIKA (HAPUS text.includes("it") KARENA BIKIN BUG KAKS/KAPUR/DLL)
+    // 2. INFORMATIKA / IMT CHECK
     else if (
-      text.includes("informatika") || 
-      text.includes("imt") || 
-      text.includes("komputer") || 
-      text.includes("coding") || 
-      text.includes("teknologi")
+      rawString.includes("informatika") || 
+      rawString.includes("imt") || 
+      rawString.includes("komputer") || 
+      rawString.includes("coding") || 
+      rawString.includes("teknologi")
     ) {
       intent = "S1_IMT";
     }
 
-    // Konsisten kembalikan dengan Underscore
+    // Mengembalikan response_text
     return res.status(200).json({ response_text: intent });
   }
 
