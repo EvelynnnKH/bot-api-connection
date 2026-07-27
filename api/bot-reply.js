@@ -11,39 +11,33 @@ export default function handler(req, res) {
       try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
 
-    // Ambil MURNI teks yang diketik user saja
-    const explicitText = (
-      body?.user_message || 
-      body?.pesan_masuk || 
-      body?.message || 
-      body?.text || 
-      ''
-    ).toLowerCase().trim();
+    // Ambil MURNI teks pesan yang diketik user
+    const rawText = body?.user_message || body?.pesan_masuk || body?.message || body?.text || '';
+    const text = String(rawText).toLowerCase().trim();
 
     let intent = "UNKNOWN";
 
-    // 1. KONDISI MANAJEMEN
-    if (explicitText.includes("manajemen") || explicitText.includes("management") || explicitText.includes("bisnis")) {
-      if (explicitText.includes("s1") || explicitText.includes("ibm") || explicitText.includes("sarjana")) {
+    // 1. CEK MANAJEMEN
+    if (text.includes("manajemen") || text.includes("management") || text.includes("bisnis")) {
+      if (text.includes("s1") || text.includes("ibm") || text.includes("sarjana")) {
         intent = "S1_IBM";
-      } else if (explicitText.includes("s2") || explicitText.includes("mem") || explicitText.includes("magister")) {
+      } else if (text.includes("s2") || text.includes("mem") || text.includes("magister")) {
         intent = "S2_MEM";
       } else {
         intent = "MANAJEMEN_GENERAL";
       }
     } 
-    // 2. KONDISI INFORMATIKA / IMT
+    // 2. CEK INFORMATIKA / IMT
     else if (
-      explicitText.includes("informatika") || 
-      explicitText.includes("imt") || 
-      explicitText.includes("komputer") || 
-      explicitText.includes("coding") || 
-      explicitText.includes("tech")
+      text.includes("informatika") || 
+      text.includes("imt") || 
+      text.includes("komputer") || 
+      text.includes("coding") || 
+      text.includes("tech")
     ) {
-      explicitText = "S1_IMT";
+      intent = "S1_IMT";
     }
 
-    // Kembalikan response_text dengan underscore (S1_IMT / MANAJEMEN_GENERAL)
     return res.status(200).json({ response_text: intent });
   }
 
