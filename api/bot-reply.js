@@ -11,7 +11,14 @@ export default function handler(req, res) {
       try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
 
-    const text = (body?.user_message || '').toLowerCase();
+    // Ambil variabel user_message, ATAU jika kosong/salah nama variabel, 
+    // ubah seluruh JSON body menjadi 1 string teks utuh
+    const userMsg = body?.user_message || body?.message || body?.text || '';
+    const fullBodyStr = JSON.stringify(body || {});
+    
+    // Gabungkan keduanya biar aman 100%
+    const text = (userMsg + " " + fullBodyStr).toLowerCase();
+    
     let intent = "UNKNOWN";
 
     // 1. MANAJEMEN 
