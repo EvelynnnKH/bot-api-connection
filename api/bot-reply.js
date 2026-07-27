@@ -11,38 +11,35 @@ export default function handler(req, res) {
       try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
 
-    // Ambil variabel user_message, ATAU jika kosong/salah nama variabel, 
-    // ubah seluruh JSON body menjadi 1 string teks utuh
-    const userMsg = body?.user_message || body?.message || body?.text || '';
+    // Ambil isi teks pesan
+    const userMsg = body?.user_message || body?.pesan_masuk || '';
     const fullBodyStr = JSON.stringify(body || {});
-    
-    // Gabungkan keduanya biar aman 100%
     const text = (userMsg + " " + fullBodyStr).toLowerCase();
-    
+
     let intent = "UNKNOWN";
 
-    // 1. MANAJEMEN 
-    if (text.includes("manajemen") || text.includes("management") || text.includes("bisnis") || text.includes("business")) {
+    // 1. CEK MANAJEMEN DULUAN
+    if (text.includes("manajemen") || text.includes("management") || text.includes("bisnis")) {
       if (text.includes("s1") || text.includes("ibm") || text.includes("sarjana")) {
         intent = "S1_IBM";
-      } else if (text.includes("s2") || text.includes("mem") || text.includes("magister") || text.includes("master")) {
+      } else if (text.includes("s2") || text.includes("mem") || text.includes("magister")) {
         intent = "S2_MEM";
       } else {
         intent = "MANAJEMEN_GENERAL";
       }
     } 
-    // 2. INFORMATIKA 
+    // 2. CEK INFORMATIKA (HAPUS text.includes("it") KARENA BIKIN BUG KAKS/KAPUR/DLL)
     else if (
       text.includes("informatika") || 
       text.includes("imt") || 
-      text.includes("it") || 
       text.includes("komputer") || 
       text.includes("coding") || 
-      text.includes("tech")
+      text.includes("teknologi")
     ) {
       intent = "S1_IMT";
     }
 
+    // Konsisten kembalikan dengan Underscore
     return res.status(200).json({ response_text: intent });
   }
 
