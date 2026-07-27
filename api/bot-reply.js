@@ -33,7 +33,7 @@ export default function handler(req, res) {
       reply = "Ada yang bisa dibantu mengenai info jurusan UC Online Learning?";
     }
 
-    return res.status(200).json({ reply });
+    return res.status(200).send({ reply });
   }
 
   return res.status(200).json({ response_text: "API Bot Aktif!" });
