@@ -1,21 +1,14 @@
 export default function handler(req, res) {
-  // Allow CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (req.method === 'POST') {
     let body = req.body;
     if (typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch (e) {
-        body = {};
-      }
+      try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
 
     const userMessage = (body?.user_message || '').toLowerCase();
@@ -33,8 +26,8 @@ export default function handler(req, res) {
       reply = "Ada yang bisa dibantu mengenai info jurusan UC Online Learning?";
     }
 
-    return res.status(200).send(reply);
+    return res.status(200).json({ reply });
   }
 
-  return res.status(200).json({ response_text: "API Bot Aktif!" });
+  return res.status(200).json({ reply: "API Bot Aktif!" });
 }
