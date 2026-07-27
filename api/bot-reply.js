@@ -11,35 +11,49 @@ export default function handler(req, res) {
       try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
 
-    // INI KUNCINYA: BACA 'pesan_masuk' DARI QONTAK
-    const rawText = body?.pesan_masuk || body?.user_message || body?.message || body?.text || '';
-    const text = String(rawText).toLowerCase();
+    // Ubah seluruh body JSON menjadi string untuk pemindaian menyeluruh
+    const fullPayloadStr = JSON.stringify(body || {}).toLowerCase();
+    
+    // Tangkap dari variabel umum
+    const explicitText = (
+      body?.pesan_masuk || 
+      body?.user_message || 
+      body?.message || 
+      body?.text || 
+      ''
+    ).toLowerCase();
+
+    // Gabungkan teks spesifik dan payload utuh
+    const textToSearch = explicitText + " " + fullPayloadStr;
 
     let intent = "UNKNOWN";
 
-    // 1. CEK MANAJEMEN
-    if (text.includes("manajemen") || text.includes("management") || text.includes("bisnis") || text.includes("business")) {
-      if (text.includes("s1") || text.includes("ibm") || text.includes("sarjana")) {
+    // 1. KONDISI MANAJEMEN
+    if (textToSearch.includes("manajemen") || textToSearch.includes("management") || textToSearch.includes("bisnis")) {
+      if (textToSearch.includes("s1") || textToSearch.includes("ibm") || textToSearch.includes("sarjana")) {
         intent = "S1_IBM";
-      } else if (text.includes("s2") || text.includes("mem") || text.includes("magister") || text.includes("master")) {
+      } else if (textToSearch.includes("s2") || textToSearch.includes("mem") || textToSearch.includes("magister")) {
         intent = "S2_MEM";
       } else {
         intent = "MANAJEMEN_GENERAL";
       }
     } 
-    // 2. CEK INFORMATIKA / IMT
+    // 2. KONDISI INFORMATIKA / IMT
     else if (
-      text.includes("informatika") || 
-      text.includes("imt") || 
-      text.includes("komputer") || 
-      text.includes("coding") || 
-      text.includes("tech")
+      textToSearch.includes("informatika") || 
+      textToSearch.includes("imt") || 
+      textToSearch.includes("komputer") || 
+      textToSearch.includes("coding") || 
+      textToSearch.includes("tech")
     ) {
       intent = "S1_IMT";
     }
 
-    return res.status(200).json({ response_text: intent });
+    // Jika masih UNKNOWN, kembalikan string payload biar keliatan di DEBUG RESULT
+    const responseValue = intent !== "UNKNOWN" ? intent : `UNKNOWN_PAYLOAD:${fullPayloadStr}`;
+
+    return res.status(200).json({ response_text: responseValue });
   }
 
-  return res.status(200).json({ response_text: "UNKNOWN" });
+  return res.status(200).json({ response_text: "UNKNOWN_NOT_POST" });
 }
