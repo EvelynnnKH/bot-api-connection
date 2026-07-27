@@ -11,33 +11,38 @@ export default function handler(req, res) {
       try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
 
-    // Ubah SELURUH objek body menjadi 1 string teks (apapun nama key variabel dari Qontak)
-    const rawString = JSON.stringify(body || {}).toLowerCase();
-
+    // Ambil variabel user_message, ATAU jika kosong/salah nama variabel, 
+    // ubah seluruh JSON body menjadi 1 string teks utuh
+    const userMsg = body?.user_message || body?.message || body?.text || '';
+    const fullBodyStr = JSON.stringify(body || {});
+    
+    // Gabungkan keduanya biar aman 100%
+    const text = (userMsg + " " + fullBodyStr).toLowerCase();
+    
     let intent = "UNKNOWN";
 
-    // 1. MANAJEMEN CHECK
-    if (rawString.includes("manajemen") || rawString.includes("management") || rawString.includes("bisnis")) {
-      if (rawString.includes("s1") || rawString.includes("ibm") || rawString.includes("sarjana")) {
+    // 1. MANAJEMEN 
+    if (text.includes("manajemen") || text.includes("management") || text.includes("bisnis") || text.includes("business")) {
+      if (text.includes("s1") || text.includes("ibm") || text.includes("sarjana")) {
         intent = "S1_IBM";
-      } else if (rawString.includes("s2") || rawString.includes("mem") || rawString.includes("magister")) {
+      } else if (text.includes("s2") || text.includes("mem") || text.includes("magister") || text.includes("master")) {
         intent = "S2_MEM";
       } else {
         intent = "MANAJEMEN_GENERAL";
       }
     } 
-    // 2. INFORMATIKA / IMT CHECK
+    // 2. INFORMATIKA 
     else if (
-      rawString.includes("informatika") || 
-      rawString.includes("imt") || 
-      rawString.includes("komputer") || 
-      rawString.includes("coding") || 
-      rawString.includes("teknologi")
+      text.includes("informatika") || 
+      text.includes("imt") || 
+      text.includes("it") || 
+      text.includes("komputer") || 
+      text.includes("coding") || 
+      text.includes("tech")
     ) {
       intent = "S1_IMT";
     }
 
-    // Mengembalikan response_text
     return res.status(200).json({ response_text: intent });
   }
 
