@@ -14,19 +14,28 @@ export default function handler(req, res) {
     const text = (body?.user_message || '').toLowerCase();
     let intent = "UNKNOWN";
 
-    if (text.includes("manajemen") || text.includes("management")) {
-      if (text.includes("s1") || text.includes("ibm")) {
+    // 1. MANAJEMEN 
+    if (text.includes("manajemen") || text.includes("management") || text.includes("bisnis") || text.includes("business")) {
+      if (text.includes("s1") || text.includes("ibm") || text.includes("sarjana")) {
         intent = "S1_IBM";
-      } else if (text.includes("s2") || text.includes("mem")) {
+      } else if (text.includes("s2") || text.includes("mem") || text.includes("magister") || text.includes("master")) {
         intent = "S2_MEM";
       } else {
         intent = "MANAJEMEN_GENERAL";
       }
-    } else if (text.includes("informatika") || text.includes("imt")) {
+    } 
+    // 2. INFORMATIKA 
+    else if (
+      text.includes("informatika") || 
+      text.includes("imt") || 
+      text.includes("it") || 
+      text.includes("komputer") || 
+      text.includes("coding") || 
+      text.includes("tech")
+    ) {
       intent = "S1_IMT";
     }
 
-    // Balas string intent murni
     return res.status(200).json({ response_text: intent });
   }
 
